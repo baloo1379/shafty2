@@ -1,20 +1,41 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
+import store from '../store/index'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Home,
+    meta: {
+      guest: true
+    }
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    path: '/authorize',
+    name: 'Auth',
     component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/About.vue')
+      return import(/* webpackChunkName: "auth" */ '../views/Auth.vue')
+    }
+  },
+  {
+    path: '/search',
+    name: 'About',
+    component: function () {
+      return import(/* webpackChunkName: "search" */ '../views/Search.vue')
+    },
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/album',
+    name: 'Album',
+    component: function () {
+      return import(/* webpackChunkName: "album" */ '../views/Album.vue')
+    },
+    meta: {
+      requiresAuth: true
     }
   }
 ]
@@ -22,6 +43,26 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (store.getters.isLoggedIn) {
+      next()
+      return
+    }
+    next('/')
+    return
+  }
+  if (to.matched.some(record => record.meta.guest)) {
+    if (store.getters.isLoggedIn) {
+      next('/album')
+      return
+    }
+    next()
+    return
+  }
+  next()
 })
 
 export default router
