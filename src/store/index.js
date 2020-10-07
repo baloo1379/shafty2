@@ -38,7 +38,7 @@ export default createStore({
     logout({ commit }) {
       return new Promise((resolve, reject) => {
         commit('auth_clear')
-        localStorage.removeItem('token')
+        sessionStorage.removeItem('token')
         delete axios.defaults.headers.common['Authorization']
         resolve()
       })
@@ -51,7 +51,7 @@ export default createStore({
       const redirectUri = 'http://poznan.baloo.ml:8081/authorize'
       const scope = ['user-top-read']
       const responseType = 'token'
-      const showDialog = true
+      const showDialog = false
 
       const url = new URL('/authorize', 'https://accounts.spotify.com')
       url.searchParams.append('client_id', clientId)
