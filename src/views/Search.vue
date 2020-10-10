@@ -1,14 +1,16 @@
 <template>
   <section class="section">
-    <SearchInput @query="requestAlbums" @empty-query="clearSearchResults" />
-    <AlbumRow v-for="album in albums" :key="album.id" class="mb-3" :album="album" />
+    <div class="container">
+      <SearchInput @query="requestAlbums" @empty-query="clearSearchResults" />
+      <AlbumRow v-for="album in albums" :key="album.id" class="mb-3" :album="album" />
+    </div>
   </section>
 </template>
 
 <script>
 import axios from 'axios'
-import SearchInput from '../components/SearchInput'
-import AlbumRow from '../components/AlbumRow'
+import SearchInput from '../components/Search/SearchInput'
+import AlbumRow from '../components/Search/AlbumRow'
 
 export default {
   name: 'Search',
@@ -30,7 +32,7 @@ export default {
       const url = new URL('/v1/search', 'https://api.spotify.com')
       url.searchParams.append('q', query)
       url.searchParams.append('type', 'album')
-      // eslint-disable-next-line no-unused-vars
+
       const response = await axios.get(url.toString())
       for (const item of response.data.albums.items) {
         const album = {}

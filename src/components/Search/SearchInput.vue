@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import debounce from '../classes/Debounce'
+import { debounce } from '@/classes/Utils'
 
 export default {
   name: 'SearchInput',

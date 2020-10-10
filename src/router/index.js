@@ -29,7 +29,7 @@ const routes = [
     }
   },
   {
-    path: '/album',
+    path: '/album/:id',
     name: 'Album',
     component: function () {
       return import(/* webpackChunkName: "album" */ '../views/Album.vue')

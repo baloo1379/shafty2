@@ -1,5 +1,5 @@
 <template>
-  <article class="media">
+  <a class="media has-text-black" :href="href">
     <figure class="media-left">
       <p class="image is-96x96">
         <img :src="album.img" >
@@ -12,11 +12,11 @@
           <br>
           {{ album.artist }}
           <br>
-          <small>{{ album.release_date }}</small>
+          <small>{{ new Date(album.release_date).getFullYear() }}</small>
         </p>
       </div>
     </div>
-  </article>
+  </a>
 </template>
 
 <script>
@@ -24,6 +24,11 @@ export default {
   name: 'AlbumRow',
   props: {
     album: Object
+  },
+  computed: {
+    href: function () {
+      return '/album/' + this.album.id
+    }
   }
 }
 </script>
@@ -37,7 +42,7 @@ export default {
     margin: 0 0 .75rem 0;
     padding: 0;
   }
-  article.media:hover {
+  .media:hover {
     background: rgb(240,240,240);
   }
 </style>

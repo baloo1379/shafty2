@@ -1,9 +1,9 @@
 <template>
   <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <p class="navbar-item">
+      <a class="navbar-item" :href="homeLink">
         Shafty
-      </p>
+      </a>
       <a class="navbar-item" @click="logout" v-show="this.$store.getters.isLoggedIn">
         Logout
       </a>
@@ -16,6 +16,12 @@
 import axios from 'axios'
 
 export default {
+  name: 'App',
+  data() {
+    return {
+      homeLink: ''
+    }
+  },
   created: function () {
     const me = this
     axios.interceptors.response.use(undefined, function (err) {
@@ -29,6 +35,11 @@ export default {
         throw err
       })
     })
+    if (this.$store.getters.isLoggedIn) {
+      this.homeLink = '/search'
+    } else {
+      this.homeLink = '/'
+    }
   },
   methods: {
     logout: function() {

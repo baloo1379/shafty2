@@ -4,7 +4,9 @@ import axios from 'axios'
 export default createStore({
   state: {
     status: '',
-    token: sessionStorage.getItem('token') || ''
+    token: sessionStorage.getItem('token') || '',
+    current_preview: '',
+    preview_status: 'pause'
   },
   mutations: {
     auth_success(state, token) {
@@ -17,23 +19,37 @@ export default createStore({
     auth_clear(state) {
       state.status = ''
       state.token = ''
+    },
+    player_play(state, fileUrl) {
+      state.preview_status = 'play'
+      state.current_preview = fileUrl
+    },
+    player_pause(state) {
+      state.preview_status = 'pause'
+    },
+    player_stop(state) {
+      state.preview_status = 'pause'
     }
   },
   actions: {
     login({ commit }, url) {
-      const parsedUrl = new URL(url)
-      const params = parsedUrl.hash.replace('#', '').split('&')
-      const paramsMap = new Map(params.map(param => {
-        return param.split('=')
-      }))
-      if (paramsMap.has('error')) {
-        commit('auth_error', paramsMap.get('error'))
-      } else {
-        const token = paramsMap.get('access_token')
-        sessionStorage.setItem('token', token)
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        commit('auth_success', token)
-      }
+      return new Promise((resolve, reject) => {
+        const parsedUrl = new URL(url)
+        const params = parsedUrl.hash.replace('#', '').split('&')
+        const paramsMap = new Map(params.map(param => {
+          return param.split('=')
+        }))
+        if (paramsMap.has('error')) {
+          commit('auth_error', paramsMap.get('error'))
+          reject(new Error('auth_error'))
+        } else {
+          const token = paramsMap.get('access_token')
+          sessionStorage.setItem('token', token)
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+          commit('auth_success', token)
+          resolve()
+        }
+      })
     },
     logout({ commit }) {
       return new Promise((resolve, reject) => {
@@ -42,6 +58,13 @@ export default createStore({
         delete axios.defaults.headers.common['Authorization']
         resolve()
       })
+    },
+    toggle_preview({ commit }, fileUrl) {
+      if (this.state.preview_status === 'play' && this.state.current_preview === fileUrl) {
+        commit('player_pause')
+      } else {
+        commit('player_play', fileUrl)
+      }
     }
   },
   getters: {
